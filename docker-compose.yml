@@ -14,6 +14,13 @@ services:
       - "3001:3001"
     links:
       - db
+  dictionary:
+    build: .
+    command: python3 -u dictionary.py
+    ports:
+      - "3002:3002"
+    links:
+      - db
   db:
     image: mongo:latest
     hostname: project_mongodb
