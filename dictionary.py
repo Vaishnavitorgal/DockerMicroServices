@@ -10,7 +10,7 @@ global stories
 stories = dict()
 global recos
 recos = dict()
-global categories
+global categoriesmon
 categories = set()
 global app
 app = Flask(__name__)
@@ -36,7 +36,7 @@ def get_word_meaning(word):
 
 
 
-@app.route('/get-story', methods=['POST'])
+@app.route('/get-meaning', methods=['POST'])
 def get_story():
     """ 
     This method fetches all the stories and returns.
@@ -46,22 +46,24 @@ def get_story():
     data = request.json
     
     # try:
-    bookno = data['bookno']
-    story = {"story": stories[bookno]['content'], "bookno":bookno}
+    word = data['word']
     username = data['username']
     _users = _db['users'].find()
-    users = [{"id": user["_id"], "username": user["username"], "password": user["password"], "history": user['history']} for user in _users]
+    users = [{"id": user["_id"], "username": user["user"], "password": user["pass"], "history": user['history']} for user in _users]
     user = None
     for _user in users:
         if _user['username'] == username:
             user = _user
-    print('------------HERE---------------')
+
     print(user)
     history = user['history']
     print(type(history))
-    history.append(bookno)
-    _db['users'].update_one({"username":username}, {'$set':{"history": history}})
-    return jsonify(story)
+    history.append(word)
+    # _db['users'].update_one({"user":username}, {'$set':{"history": history}})
+    result = requests.get('https://api.dictionaryapi.dev/api/v2/entries/en/'+word, timeout=2)
+    # meaning = result.json()
+    meaning = result.json()[0]['meanings'][0]['definitions'][0]['definition']
+    return jsonify({"meaning": meaning})
     # except KeyError:
     #     return jsonify({"msg":"Error"})
 

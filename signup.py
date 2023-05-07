@@ -30,7 +30,7 @@ def signup():
     data = request.json
     username = data['username']
     password = data['password']
-    user = {"user":username, "pass": password}
+    user = {"user":username, "pass": password, "history":[]}
     db = get_db()
     users = db.users
     users.insert_one(user)
